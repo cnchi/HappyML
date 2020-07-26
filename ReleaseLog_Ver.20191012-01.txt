@@ -1,0 +1,105 @@
+[20191012-01] MODIFY
+* [MODIFY] preprocessor.py, missing_data()
+- 加上一個條件判斷： if (type(dataset) is pd.DataFrame) and (sum(dataset.isnull().sum()) > 0)。用來判斷是否為 DataFrame，以及是否需要缺失資料補遺。
+- 使用 missing_cols = [i for i, j in enumerate(dataset.isnull().any()) if j]，自動判斷缺失欄位。不必使用者告知缺失欄位是哪幾個。
+- 因為有自動判斷缺失欄位，所以就算沒有缺失欄位，也可以呼叫。並不會造成任何「無缺失」欄位的任何改變。
+
+
+[20190918-01] BUGFIX
+
+* [BUGFIX] regression.py Line# 35
+- 原本使用 import statsmodels.formula.api as sm 匯入的套件，現在要改成 import statsmodels.regression.linear_model as sm 這樣才能匯入。
+
+
+[20190826-01] BUBFIX & MODIFY & NEW
+
+* [BUGFIX] preprocessor.missing_data(ary, strategy="mean")
+- 原先版本還保留使用 NDArray 的樣子。目前已經修正成使用 DataFrame 的版本了。
+
+* [MODIFY] preprocessor.decomposition(dataset, x_columns, y_columns=[])
+- 原本 y_columns 是個「必傳」的參數。因為「集群（Clustering）」問題，只有自變數，沒有應變數，因此修改成 y_columns=[]。
+- 當你不提供 y_columns 時，它會使用預設值 []，導致不會回傳任何應變數（集群問題沒有任何應變數）。
+
+* [NEW] clustering.KMeansCluster
+- 新增 KMeansCluster 類別，實作 K-Means 集群演算法。
+
+* [NEW] model_drawer.cluster_drawer(x, y, centroids, title="", font='Arial Unicode MS')
+- 可以用來將集群結果視覺化的函數。
+- x: DataFrame, 只能有兩個 Features。y: DataFrame, 集群預設結果。centroids: 各集群的中心點。
+
+* [NEW] preprocessor.combine(dataset, y_pred)
+- 可以將 y_pred 的答案，附加到 dataset 尾部
+- 適合用於集群分析取得答案後，黏到 dataset 的尾部。
+
+
+[20190817-01] BUGFIX & NEW
+
+* [BUGFIX] model_drawer
+- 該模組內有一個函數，叫做 tree_drawer（），需要 import pydotplus 後才能運作。
+- 而 pydotplus 是需要 pip install pydotplus 之後，才有辦法使用的。
+- 當使用者 from robert.model_drawer import <tree_drawer() 以外的函數>，且沒有安裝 pydotplus 時，系統會發出 ImportError 說：「無法引入 pydotplut」。
+- 加上下列機制，讓使用者沒有安裝 pydotplus，也可以引用 robert.model_drawer 裡 tree_drawer() 以外的其它函數。
+try:
+    import pydotplus
+except ImportError:
+    pass
+
+* [BUGFIX] preprocessor.feature_scaling(fit_ary, transform_arys=None)
+- 當 transform_arys 只有一個時，使用者容易寫成 pp.feature_scaling(fit_ary=X, transform_arys=X)
+- 但 transform_arys 程式內部就直接把它當成 tuple 了。所以使用者如上述方法叫用，會失敗。
+- 正確叫法應該是 pp.feature_scaling(fit_ary=X, transform_arys=(X,))。別忘了單一元素的 tuple 要寫成 (X,)
+- 為了讓使用者自由使用 Tuple 與單一元素。程式碼改成這樣：
+if type(transform_arys) is tuple:
+    return (pd.DataFrame(scaler.transform(ary.astype("float64")), index=ary.index, columns=ary.columns) for ary in transform_arys)
+else:
+    return pd.DataFrame(scaler.transform(transform_arys.astype("float64")), index=transform_arys.index, columns=transform_arys.columns)
+- 如此一來，使用者也可以用 pp.feature_scaling(fit_ary=X, transform_arys=X) 這種方法叫用了。
+
+* [BUGFIX] preprocessor.KBestSelector
+- 當有人這麼寫的時候：
+selector = KBestSelector(best_k=2)
+X = selector.fit(x_ary=X, y_ary=Y, auto=True, verbose=True, sort=True).transform(x_ary=X)
+- 會因為 auto=True，導致 best_k=2 失效。所以改成KBestSelector(best_k=??) best_k= "auto" | <整數> 的寫法
+if type(best_k) is int:
+    self.__strategy = "fixed"
+    self.best_k = best_k
+else:
+    self.__strategy = "auto"
+    self.best_k = 1
+- 而 KBestSelector.fit(x_ary=X, y_ary=Y, auto=True, verbose=True, sort=True) 中的 auto=True/False 目前保留但不作用。將在下一版移除。
+
+* [BUGFIX] performance.KFoldClassificationPerformance
+- 每次 K 折運算時，只要某一折內，不含特定應變數 Y 的某種答案，就會發出以下警告訊號：
+Warning: The least populated class in y has only 5 members, which is too few.
+UndefinedMetricWarning: F-score is ill-defined and being set to 0.0 in labels with no predicted samples
+- 加上這個選項，讓 Warning 不再出現。只有 Error 才出現：
+import warnings
+warnings.filterwarnings('ignore')
+
+* [NEW] preprocessor.PCASelector
+- 新增 PCASelector 類別，實作以 PCA 將特性（Features）降維
+
+
+
+
+[20190813-01] MODIFY & NEW
+
+* [MODIFY] preprocessor.label_encoder(ary, mapping=False)
+- 新增一個參數 mapping=False
+- 當 mapping=True 時，會傳回來兩個值
+	(1) LabelEncode 過的 DataFrame 陣列
+	(2) 對應字典。如 {0:"Yes", 1:"No"}，就是把 Yes 編碼為 0，No 編碼為 "1"
+
+* [MODIFY] preprocessor.onehot_encoder(ary, columns=[], remove_trap=False)
+- 新增一個參數 remove_trap=False
+- 當 remove_trap=True 時，會自動移除 One Hot Encoder 後的一欄，以去除自變數共線性。
+- 會自動保持原來的欄位順序。不會因為執行 One Hot Encoder，而改變欄位順序。
+
+* [NEW] classification.DecisionTree
+- 新增 DecisionTree 類別，實作 Decision Tree。
+
+* [NEW] classification.RandomForest
+- 新增 RandomForest 類別，實作 Random Forest
+
+* [NEW] model_drawer.tree_drawer()
+- 新增 tree_drawer()，以繪製 Decision Tree 的分類結果。
