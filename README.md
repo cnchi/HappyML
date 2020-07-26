@@ -5,4 +5,5 @@ HappyML 是一個教學用的機器學習函式庫。該函式庫簡化了機器
 
 # Revision History
 
-* 2020/7/26: Version 1.0. Create this repository. 
+* 2020/7/26: Version 1.01 Add epochs_metrics_plot() into model_drawer.py
+* 2020/7/26: Version 1.0. Create this repository.
