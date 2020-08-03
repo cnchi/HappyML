@@ -18,15 +18,15 @@ def sample_model(sample_data=None, sample_color="red", model_data=None, model_co
     # for showing Chinese characters
     plt.rcParams['font.sans-serif']=[font]
     plt.rcParams['axes.unicode_minus'] = False
-    
+
     # Draw for Sample Data with Scatter Chart
     if sample_data != None:
         plt.scatter(sample_data[0], sample_data[1], color=sample_color)
-    
+
     # Draw for Model with line chart
     if model_data != None:
         plt.plot(model_data[0], model_data[1], color=model_color)
-    
+
     # Draw for title, xlabel, ylabel
     if sample_data!=None or model_data!=None:
         plt.title(title)
@@ -47,20 +47,20 @@ def classify_result(x, y, classifier, fg_color=("orange", "blue"), bg_color=("re
     # Get the xlabel & ylabel first
     xlabel = x.columns[0]
     ylabel = x.columns[1]
-    
+
     # Prepare each dot of background
     x = x.values
     y = y.values
     x_axis_range = np.arange(x[:, 0].min()-1, x[:, 0].max()+1, 0.01)
     y_axis_range = np.arange(x[:, 1].min()-1, x[:, 1].max()+1, 0.01)
     X_background, Y_background = np.meshgrid(x_axis_range, y_axis_range)
-    
+
     # Limit the range of drawing
     plt.xlim(X_background.min(), X_background.max())
     plt.ylim(Y_background.min(), Y_background.max())
-    
+
     # Draw the dots of background (as the predicting result)
-    
+
     # To predict each dots at X_background x Y_background:
     # 1. X_background.ravel() as Row0, Y_background.ravel() as Row1
     # 2. Transpose Row0, Row1, as Column0, Column1
@@ -69,13 +69,13 @@ def classify_result(x, y, classifier, fg_color=("orange", "blue"), bg_color=("re
     # 5. Change 1D back to 2D as dimention X_background.shape
     Target_predict = pd.DataFrame(classifier.predict(pd.DataFrame(np.array([X_background.ravel(), Y_background.ravel()]).T))).values.reshape(X_background.shape)
     plt.contourf(X_background, Y_background, Target_predict, alpha=0.75, cmap=ListedColormap(bg_color))
-    
+
     # Draw the sample data in dots
     # Iterate all types of Targets (e.g. Y_real = 0, Y_real = 1, ...)
     for y_real_index, y_real in enumerate(np.unique(y)):
         row_selector = y.reshape(x.shape[0]) # y.ndim =2, we need 1D array to select rows of X
         plt.scatter(x[row_selector == y_real, 0], x[row_selector == y_real, 1], c=[ListedColormap(fg_color)(y_real_index)], label=y_real)
-    
+
     # Set the Title & Label
     # for showing Chinese characters
     plt.rcParams['font.sans-serif']=[font]
@@ -115,7 +115,7 @@ def tree_drawer(classifier, feature_names=None, target_names=None, graphviz_bin=
 
 
 # In[] cluster_drawer()
-import matplotlib.cm as cm   
+import matplotlib.cm as cm
 
 # Shut off the warning messages from matplotlib
 # Reference: https://is.gd/Iq1WGw
@@ -127,18 +127,18 @@ def cluster_drawer(x, y, centroids, title="", font='Arial Unicode MS'):
     if x.shape[1] != 2:
         print("ERROR: x must have only two features to draw!!")
         return None
-    
+
     # Change y from DataFrame to NDArray
     y_ndarray = y.values.ravel()
-    
+
     # Get how many classes in y
     y_unique = np.unique(y_ndarray)
-    
+
     # Iterate all classes in y
     colors = cm.rainbow(np.linspace(0, 1, len(y_unique)))
     for val, col in zip(y_unique, colors):
         plt.scatter(x.iloc[y_ndarray==val, 0], x.iloc[y_ndarray==val, 1], s=50, c=col, label="Cluster {}".format(val))
-    
+
     # Draw Centroids
     plt.scatter(centroids[:, 0], centroids[:, 1], s=200, c="black", marker="^", label="Centroids")
 
@@ -156,18 +156,46 @@ def cluster_drawer(x, y, centroids, title="", font='Arial Unicode MS'):
 
 # In[] epochs_metrics_plot(): Draw the line plots of metrics for each epoch during Neural Net training
 def epochs_metrics_plot(history_dict, keys=(), title=None, xyLabel=[], ylim=(), size=()):
-  lineType = ("-", "--", ".", ":")
-  if len(ylim)==2:
-      plt.ylim(*ylim)
-  if len(size)==2:
-      plt.gcf().set_size_inches(*size)
-  epochs = range(1, len(history_dict[keys[0]])+1)
-  for i in range(len(keys)):
-      plt.plot(epochs, history_dict[keys[i]], lineType[i])
-  if title:
-      plt.title(title)
-  if len(xyLabel)==2:
-      plt.xlabel(xyLabel[0])
-      plt.ylabel(xyLabel[1])
-  plt.legend(keys, loc="best")
-  plt.show()
+    lineType = ("-", "--", ".", ":")
+    if len(ylim)==2:
+        plt.ylim(*ylim)
+    if len(size)==2:
+        plt.gcf().set_size_inches(*size)
+    epochs = range(1, len(history_dict[keys[0]])+1)
+    for i in range(len(keys)):
+        plt.plot(epochs, history_dict[keys[i]], lineType[i])
+    if title:
+        plt.title(title)
+    if len(xyLabel)==2:
+        plt.xlabel(xyLabel[0])
+        plt.ylabel(xyLabel[1])
+    plt.legend(keys, loc="best")
+    plt.show()
+
+
+# In[] show_first_n_images(): Show the first N images of dataset.
+def show_first_n_images(x_ary, y_real=[], y_pred=[], first_n=5, font_size=18, color_scheme="gray"):
+    # Get Current Figure (GCF) & Set Height 15 inches, Width 4 inches
+    plt.gcf().set_size_inches(15, 4)
+
+    # Iterate the first N images
+    for i in range(first_n):
+        # each row has first_n sub-images
+        ax = plt.subplot(1, first_n, i+1)
+
+        # "gray": black background, "binary": white background
+        ax.imshow(x_ary[i], cmap=color_scheme)
+
+        # set sub-image title
+        if y_pred == []:
+            img_title = "real = {}".format(y_real[i])
+        else:
+            img_title = "real = {}\npred = {}".format(y_real[i], y_pred[i])
+        ax.set_title(img_title, fontsize=font_size)
+
+        # Make X-axis, Y-axis without ticks
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+    # Show all images
+    plt.show()
