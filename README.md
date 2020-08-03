@@ -9,6 +9,7 @@ HappyML 是一個教學用的機器學習函式庫。該函式庫簡化了機器
 
 * 2020/08/03-01
   * [NEW] Add show_first_n_images() into model_drawer.py
+  * [NEW] Add create_seq_model() into neural_networks.py
 * 2020/07/26-01
   * [NEW] Add epochs_metrics_plot() into model_drawer.py
 * 2020/07/26-01
