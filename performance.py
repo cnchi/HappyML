@@ -141,7 +141,7 @@ class GridSearch:
         self.__k_fold = k_fold
         
         self.verbose = verbose
-        self.__validator = GridSearchCV(estimator=self.__estimator, param_grid=self.__parameters, scoring=self.__scorer, iid=False, cv=self.__k_fold, verbose=self.verbose)
+        self.__validator = GridSearchCV(estimator=self.__estimator, param_grid=self.__parameters, scoring=self.__scorer, cv=self.__k_fold, verbose=self.verbose)
 
     @property
     def verbose(self):
