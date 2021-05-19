@@ -191,39 +191,45 @@ class KBestSelector:
         else:
             self.__best_k = 1
 
-    # auto=False will be deprecated in next version
-    def fit(self, x_ary, y_ary, auto=False, verbose=False, sort=False):
+    # auto=False has been deprecated in version 2021-05-19
+    def fit(self, x_ary, y_ary, verbose=False, sort=False):
+        #Get the scores of every feature
+        kbest = SelectKBest(score_func=chi2, k="all")
+        kbest = kbest.fit(x_ary, y_ary)
+        
+        # if auto, choose the best K features
         if self.__strategy == "auto":
-            # Get the scores of every feature
-            kbest = SelectKBest(score_func=chi2, k=1)
-            kbest = kbest.fit(x_ary, y_ary)
-
-            # Choose the best K features
             sig_ary = np.full(kbest.pvalues_.shape, self.significance)
             feature_selected = np.less_equal(kbest.pvalues_, sig_ary)
             self.best_k = np.count_nonzero(feature_selected == True)
-            if verbose:
-                print("\nThe Significant Level: {}".format(self.significance))
-                p_values_dict = dict(zip(x_ary.columns, kbest.pvalues_))
-                print("\n--- The p-values of Feature Importance ---")
-
-                # Sort p-values in ascending order
-                if sort:
-                    name_pvalue = sorted(p_values_dict.items(), key=lambda kv: kv[1])
-                else:
-                    name_pvalue = [(k, v) for k, v in p_values_dict.items()]
-                for k, v in name_pvalue:
-                    sig_str = "TRUE  <" if v <= self.significance else "FALSE >"
-                    sig_str += "{:.2f}".format(self.significance)
-                    print("{} {:.8e} ({})".format(sig_str, v, k))
-
-        # Choose the best_k features
+        
+        # if verbose, show additional information
         if verbose:
+            print("\nThe Significant Level: {}".format(self.significance))
+            p_values_dict = dict(zip(x_ary.columns, kbest.pvalues_))
+            print("\n--- The p-values of Feature Importance ---")
+            
+            # if sorted, rearrange p-values in ascending order
+            if sort:
+                name_pvalue = sorted(p_values_dict.items(), key=lambda kv: kv[1])
+            else:
+                name_pvalue = [(k, v) for k, v in p_values_dict.items()]
+            
+            # Show each feature and its p-value
+            for k, v in name_pvalue:
+                sig_str = "TRUE  <" if v <= self.significance else "FALSE >"
+                sig_str += "{:.2f}".format(self.significance)
+                print("{} {:.8e} ({})".format(sig_str, v, k))
+            
+            # Show how many features have been selected
             print("\nNumber of Features Selected: {}".format(self.best_k))
+        
+        # Start to select features
         self.__selector = SelectKBest(score_func=chi2, k=self.best_k)
         self.__selector = self.__selector.fit(x_ary, y_ary)
-
+        
         return self
+
 
     def transform(self, x_ary):
         # indices=True will return an NDArray of integer for selected columns
