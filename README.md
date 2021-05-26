@@ -7,6 +7,8 @@ HappyML 是一個教學用的機器學習函式庫。該函式庫簡化了機器
 
 # Revision History
 
+* 2021/05/26-01
+  * [FIX] PCASelector.fit() shows same information no matter verbose=True or =False.
 * 2021/05/19-01
   * [REMOVE] Remove auto=False parameter from KBestSelector.fit()
   * [FIX] KBestSelector.fit() show nothing when <>auto and verbose=True.
