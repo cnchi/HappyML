@@ -273,11 +273,23 @@ class PCASelector:
         return self.__best_k
 
     def fit(self, x_ary, verbose=False, plot=False):
+        # Get information covered by each component
         pca = PCA(n_components=None)
         pca.fit(x_ary)
         info_covered = pca.explained_variance_ratio_
+        if verbose:
+            print("Information Covered by Each Component:")
+            print(info_covered)
+            print()
+        
+        # Cumulated Coverage of Information
         cumulated_sum = np.cumsum(info_covered)
         info_covered_dict = dict(zip([i+1 for i in range(info_covered.shape[0])], cumulated_sum))
+        if verbose:
+            print("Cumulated Coverage of Information:")
+            for n, c in info_covered_dict.items():
+                print("{:3d}: {}".format(n, c))
+            print()
 
         if self.__strategy == "auto":
             scaler = MinMaxScaler(feature_range=(0, info_covered.shape[0]-1))
@@ -301,7 +313,9 @@ class PCASelector:
         self.selector.fit(x_ary)
 
         if verbose:
+            print("Strategy: {}".format(self.__strategy))
             print("Select {} components, covered information {:.2%}".format(self.best_k, info_covered_dict[self.best_k]))
+            print()
 
         if plot:
             np.insert(cumulated_sum, 0, 0.0)
