@@ -14,10 +14,11 @@ import pandas as pd
 # In[] sample_model(): Draw the model as line, and sample data as scatter
 # USAGE: model_drawer.sample_model(sample_data=(X_test, Y_test), model_data=(X_test, Y_pred))
 
-def sample_model(sample_data=None, sample_color="red", model_data=None, model_color="blue", title="", xlabel="", ylabel="", font='Arial Unicode MS'):
+def sample_model(sample_data=None, sample_color="red", model_data=None, model_color="blue", title="", xlabel="", ylabel="", font=""):
     # for showing Chinese characters
-    plt.rcParams['font.sans-serif']=[font]
-    plt.rcParams['axes.unicode_minus'] = False
+    if font != "":
+        plt.rcParams['font.sans-serif']=[font]
+        plt.rcParams['axes.unicode_minus'] = False
 
     # Draw for Sample Data with Scatter Chart
     if sample_data != None:
@@ -43,7 +44,7 @@ def sample_model(sample_data=None, sample_color="red", model_data=None, model_co
 # NOTE1: Make sure you've done "Feature Scaling" before calling this function.  Otherwise the background dots will be too many to out-of-memory.
 # NOTE2: This function can only take 2 features to draw.  Make sure you selected "Best 2" features to train the classifier.
 
-def classify_result(x, y, classifier, fg_color=("orange", "blue"), bg_color=("red", "green"), title="", font='Arial Unicode MS'):
+def classify_result(x, y, classifier, fg_color=("orange", "blue"), bg_color=("red", "green"), title="", font=""):
     # Get the xlabel & ylabel first
     xlabel = x.columns[0]
     ylabel = x.columns[1]
@@ -78,8 +79,9 @@ def classify_result(x, y, classifier, fg_color=("orange", "blue"), bg_color=("re
 
     # Set the Title & Label
     # for showing Chinese characters
-    plt.rcParams['font.sans-serif']=[font]
-    plt.rcParams['axes.unicode_minus'] = False
+    if font != "":
+        plt.rcParams['font.sans-serif']=[font]
+        plt.rcParams['axes.unicode_minus'] = False
 
     plt.title(title)
     plt.xlabel(xlabel)
@@ -122,7 +124,7 @@ import matplotlib.cm as cm
 from matplotlib.axes._axes import _log as matplotlib_axes_logger
 matplotlib_axes_logger.setLevel('ERROR')
 
-def cluster_drawer(x, y, centroids, title="", font='Arial Unicode MS'):
+def cluster_drawer(x, y, centroids, title="", font=""):
     # Check for x has only two columns
     if x.shape[1] != 2:
         print("ERROR: x must have only two features to draw!!")
@@ -144,8 +146,9 @@ def cluster_drawer(x, y, centroids, title="", font='Arial Unicode MS'):
 
     # Labels & Legends
     # for showing Chinese characters
-    plt.rcParams['font.sans-serif']=[font]
-    plt.rcParams['axes.unicode_minus'] = False
+    if font != "":
+        plt.rcParams['font.sans-serif']=[font]
+        plt.rcParams['axes.unicode_minus'] = False
 
     plt.title(title)
     plt.xlabel(x.columns[0])
