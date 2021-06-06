@@ -1,3 +1,47 @@
+[20210606-01] BUGFIX
+
+* [BUGFIX] criteria.py
+- 修正叫用 criteria.AssumptionChecker.features_correlation() 時，若 heatmap=True，用 Seaborn 畫出來的 Heapmap，會跟其它圖形重疊在一起的問題。這是因為用 sns.heatmap(data=corr, annot=True) 之後，沒有馬上使用 plt.show()，導致繪製好的熱區圖，一直停留在記憶體中。如果後續還有繪製其它圖形，就會疊加在 Seaborn 留在記憶體中的熱區圖上面。目前已經在 sns.heatmap(data=corr, annot=True) 後方，添加了一道 plt.show()，強迫 Seaborn 把繪製好的熱區圖（Heatmap），馬上從記憶體輸出到螢幕上。所以，此一現象已經不會再發生了。
+
+
+[20210603-01] BUGFIX
+
+* [BUGFIX] model_drawer.py
+- 修正呼叫 sample_model()、classify_result()、cluster_drawer() 時，如果 title= 裡面的文字並未用使用中文，也就是沒有指定 font= 參數、放任它使用預設值時，會出現「findfont: Font family ['sans-serif'] not found. Falling back to DejaVu Sans」這個警告訊息之問題。這是因為原先 font= 的預設值是 font="Arial Unicode MS"。如果程式師呼叫 sample_model()、classify_result()、cluster_drawer() 三函數時，沒有特意指定 font= 的值，放任它使用預設值，而使用人的電腦內，又沒有 "Arial Unicode MS" 這個字型時，就會發出「findfont: Font family ['sans-serif'] not found. Falling back to DejaVu Sans」這個警告訊息。目前已經將 font= 的預設值，改成 font="" 了。
+
+
+[20210526-01] BUGFIX
+
+* [BUGFIX] preprocessor.py
+- 修正呼叫 preprocessor.PCASelector.fit() 時，不論指定 verbose=True 或 verbose=False，出來的訊息都一樣之問題。除了修正一個 verbose=True 的邏輯錯誤外，也大量添加當 verbose=True 時，秀出來的訊息。這次 verbose=True 添加的訊息包括 (1) 秀出每個 PCA 元素，所涵蓋的資訊量 (2) 秀出挑選幾個 PCA 元素後，累加的資訊量會有多少。
+
+
+[20210519-01] MODIFY, BUGFIX
+
+* [MODIFY] preprocessor.py
+- 將 KBestSelector.fit() 裡面的 auto=False 參數移除。移除原因為該參數已經不再具備任何作用。早在 2019 年的版本，就已經使用 KBestSelector.__init__() 裡面的 best_k="auto" 取代之了。
+
+* [BUGFIX] preprocessor.py
+- 當 KBestSelector.__init__() 內的 best_k ≠ "auto" 的情況下，就算將 KBestSelector.fit() 裡面的 verbose=True，也會看不到 KBestSelector.fit() 逐步計算過程。這個問題是出自於程式邏輯考慮不周。原版所有 verbose=True 的機制，全部都內縮於 "auto" 之下。所以只有在 best_k="auto" 時，指定 verbose=True 才會有用。目前已經將整個 KBestSelector.fit() 裡面，與 verbose 有關的邏輯全部重新改寫，不會再出現這個現象了。
+
+* [BUGFIX] performance.py
+- 呼叫 performance.GridSearch() 建構函數時，會出現 "無效的 iid= 參數" 錯誤訊息。這是因為 performance.GridSearch() 建構函數裡面會呼叫 sklearn.model_selection.GridSearchCV()。原本呼叫 GridSearchCV() 時，需要一個 iid= 參數。後來在 sklearn 新版中，已經將 GridSearchCV() 裡面的 iid= 參數拿掉了。所以才會出現 "無效的 iid= 參數" 這個錯誤訊息。目前我已經將 performance.GridSearch() 建構函數裡面，GridSearchCV() 的 iid= 參數拿掉了。
+
+
+[20200803-01] NEW
+
+* [NEW] model_drawer.py
+- 新增 show_first_n_images() 函數。它可以讓你在做「卷積神經網路」時，秀出前 N 張圖形。藉以驗證圖形載入後，處於沒問題可用的狀態。
+
+* [NEW] neural_networks.py
+- 新增 create_seq_model() 函數。讓你用一個函數，就能做到神經網路序列模型中，繁複的隱藏層添加任務。
+
+
+[20200726-01] NEW
+* [NEW] model_drawer.py
+- 為了神經網路做完之後圖形繪製的方便，新增一個 epochs_metrics_plot() 函數。它可以繪製出「訓練集 vs. 驗證集」的效能差異，藉以看出是否過擬合。
+
+
 [20191012-01] MODIFY
 * [MODIFY] preprocessor.py, missing_data()
 - 加上一個條件判斷： if (type(dataset) is pd.DataFrame) and (sum(dataset.isnull().sum()) > 0)。用來判斷是否為 DataFrame，以及是否需要缺失資料補遺。
