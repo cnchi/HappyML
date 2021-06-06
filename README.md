@@ -7,6 +7,8 @@ HappyML 是一個教學用的機器學習函式庫。該函式庫簡化了機器
 
 # Revision History
 
+* 2021/06/06-01
+  * [FIX] Heatmap in criteria.AssumptionChecker.features_correlation() will overlap with other plot.
 * 2021/06/03-01
   * [FIX] cluster_drawer() shows error message: "findfont: Font family ['sans-serif'] not found. Falling back to DejaVu Sans"
 * 2021/05/26-01
