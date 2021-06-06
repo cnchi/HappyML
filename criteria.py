@@ -117,6 +117,7 @@ class AssumptionChecker:
         if self.heatmap:
             # annot = annotation = True = put number inside matrix
             sns.heatmap(data=corr, annot=True)
+            plt.show()
         
         corr_ary = corr.to_numpy()
         corr_bool = False
