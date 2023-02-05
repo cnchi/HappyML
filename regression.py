@@ -32,7 +32,7 @@ class SimpleRegressor:
         return self.__regressor.score(x_test, y_test)
 
 # In[] Define the class for Multiple Linear Regressor
-import statsmodels.regression.linear_model as sm
+import statsmodels.api as sm
 import copy
 
 class MultipleRegressor:
