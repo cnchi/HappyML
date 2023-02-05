@@ -1,3 +1,18 @@
+[20230205-01] MODIFY, NEW
+* [MODIFY] regression.py
+- 修正引入的多元線性迴歸函式庫。
+本來： import statsmodels.regression.linear_model as sm
+後來： import statsmodels.api as sm
+
+* [NEW] regression.py
+- 替 class MultipleRegressor 增加「自動增加常數項」的功能。包含：
+1. 新增 add_constant(self, exog)，全自動判斷是否已經加了常數項。
+2. 在 backward_elimination(), fit(), predict() 一開頭，都先呼叫 add_constant()，確保有常數項。
+- 新增針對 X_train, X_test 自動切片功能。
+1. 若有做過 backward_elimination()，則 __features 存在，先切片再擬合、預測。
+2. 若沒做過 backward_elimination()，則 __features 不存在，代表不需降維。直接擬合、預測。
+
+
 [20210606-01] BUGFIX
 
 * [BUGFIX] criteria.py

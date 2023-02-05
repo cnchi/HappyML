@@ -36,23 +36,51 @@ import statsmodels.api as sm
 import copy
 
 class MultipleRegressor:
-    __regressor = None
 
     def __init__(self) :
         self.__regressor = None
+        self.__features = None
 
     @property
     def regressor(self):
         return self.__regressor
 
+    def add_constant(self, exog):
+        # This function only support DataFrame
+        if isinstance(exog, pd.DataFrame):
+            # Check if the column 'const' has been added
+            if not ('const' in exog):
+                exog = sm.add_constant(exog)
+            return exog
+        else:
+            print("Error: HappyML only supports pandas.DataFrame")
+            raise TypeError()
+
     def fit(self, x_train, y_train):
+        # Make sure there is a const column before fitting
+        x_train = self.add_constant(x_train)
+
+        # If there is a dimension reduction result, use it
+        if self.__features is not None:
+            x_train = x_train.iloc[:, self.__features]
+
         self.__regressor = sm.OLS(exog=x_train, endog=y_train).fit()
         return self
 
     def predict(self, x_test):
+        # Make sure there is a const column before predicting
+        x_test = self.add_constant(x_test)
+
+        # If there is a dimension reduction result, use it
+        if self.__features is not None:
+            x_test = x_test.iloc[:, self.__features]
+
         return self.__regressor.predict(exog=x_test)
 
     def backward_elimination(self, x_train, y_train, significance=0.05, verbose=False):
+        # Make sure there is a const column before reduction
+        x_train = self.add_constant(x_train)
+
         # Initialize variables
         final_features = [i for i in range(x_train.shape[1])]
         p_values = [1.0 for i in range(x_train.shape[1])]
@@ -67,7 +95,7 @@ class MultipleRegressor:
                 print("CUR: {} Adj-RSquared={:.4f}".format(dict(zip(feature_names, ["{:.4f}".format(i) for i in p_values])), prev_adj_rsquared))
 
             # Load the current chosen columns
-            x_opt = x_train.values[:, this_features]
+            x_opt = x_train.iloc[:, this_features]
 
             # Fit the model with chosen columns
             self.fit(x_train=x_opt, y_train=y_train)
@@ -101,6 +129,8 @@ class MultipleRegressor:
         if verbose:
             feature_names = [x_train.columns[pos] for pos in final_features]
             print("*** FINAL FEATURES: {}".format(feature_names))
+
+        self.__features = final_features
         return final_features
 
     def r_score(self):
