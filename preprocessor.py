@@ -196,38 +196,38 @@ class KBestSelector:
         #Get the scores of every feature
         kbest = SelectKBest(score_func=chi2, k="all")
         kbest = kbest.fit(x_ary, y_ary)
-        
+
         # if auto, choose the best K features
         if self.__strategy == "auto":
             sig_ary = np.full(kbest.pvalues_.shape, self.significance)
             feature_selected = np.less_equal(kbest.pvalues_, sig_ary)
             self.best_k = np.count_nonzero(feature_selected == True)
-        
+
         # if verbose, show additional information
         if verbose:
             print("\nThe Significant Level: {}".format(self.significance))
             p_values_dict = dict(zip(x_ary.columns, kbest.pvalues_))
             print("\n--- The p-values of Feature Importance ---")
-            
+
             # if sorted, rearrange p-values in ascending order
             if sort:
                 name_pvalue = sorted(p_values_dict.items(), key=lambda kv: kv[1])
             else:
                 name_pvalue = [(k, v) for k, v in p_values_dict.items()]
-            
+
             # Show each feature and its p-value
             for k, v in name_pvalue:
                 sig_str = "TRUE  <" if v <= self.significance else "FALSE >"
                 sig_str += "{:.2f}".format(self.significance)
                 print("{} {:.8e} ({})".format(sig_str, v, k))
-            
+
             # Show how many features have been selected
             print("\nNumber of Features Selected: {}".format(self.best_k))
-        
+
         # Start to select features
         self.__selector = SelectKBest(score_func=chi2, k=self.best_k)
         self.__selector = self.__selector.fit(x_ary, y_ary)
-        
+
         return self
 
 
@@ -281,7 +281,7 @@ class PCASelector:
             print("Information Covered by Each Component:")
             print(info_covered)
             print()
-        
+
         # Cumulated Coverage of Information
         cumulated_sum = np.cumsum(info_covered)
         info_covered_dict = dict(zip([i+1 for i in range(info_covered.shape[0])], cumulated_sum))
