@@ -9,7 +9,7 @@ HappyML 是一個教學用的機器學習函式庫。該函式庫簡化了機器
 
 # Revision History
 
-* 2021/06/06-01
+* 2023/02/05-01
   * [NEW] MultipleRegressor: Now it can automatically detect if there are constants in the incoming X_train and X_test. If not, it will be added automatically.
 * 2021/06/06-01
   * [FIX] Heatmap in criteria.AssumptionChecker.features_correlation() will overlap with other plot.
