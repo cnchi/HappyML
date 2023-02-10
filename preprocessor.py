@@ -120,8 +120,13 @@ def feature_scaling(fit_ary, transform_arys=None):
     scaler.fit(fit_ary.astype("float64"))
 
     if type(transform_arys) is tuple:
-        return (pd.DataFrame(scaler.transform(ary.astype("float64")), index=ary.index, columns=ary.columns) for ary in transform_arys)
+        result_list = list()
+        for ary in transform_arys:
+            ary = pd.DataFrame(ary)
+            result_list += [pd.DataFrame(scaler.transform(ary.astype("float64")), index=ary.index, columns=ary.columns)]
+        return result_list
     else:
+        transform_arys = pd.DataFrame(transform_arys)
         return pd.DataFrame(scaler.transform(transform_arys.astype("float64")), index=transform_arys.index, columns=transform_arys.columns)
 
 # In[] Remove Columns
