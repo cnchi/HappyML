@@ -1,4 +1,14 @@
+[20230210-01] BUGFIX, NEW
+
+* [BUGFIX] preprocessor.py
+- 修正 feature_scaling() 函數，傳入 pandas.Series 而非 pandas.DataFrame 時，引發的錯誤訊息。原先沒有考慮到一維的 Series。目前改成一律用 pandas.DataFrame() 轉換函數，轉成 DataFrame 之後，再進行後續的處理步驟之方法解決。
+
+* [NEW] regression.py
+- 替 MultipleRegressor 增加一個屬性，叫做 .named_features。它可以用「欄位名稱」，傳回除了 "const" 以外的降維結果。如：['R&D Spend', 'Marketing Spend']。
+
+
 [20230205-01] MODIFY, NEW
+
 * [MODIFY] regression.py
 - 修正引入的多元線性迴歸函式庫。
 本來： import statsmodels.regression.linear_model as sm

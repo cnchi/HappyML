@@ -9,6 +9,9 @@ HappyML 是一個教學用的機器學習函式庫。該函式庫簡化了機器
 
 # Revision History
 
+* 2023/02/10-01
+  * [BUGFIX] preprocessor.feature_scaling(): Fix an error message caused by the feature_scaling() function when the incoming array is not a DataFrame. 
+  * [NEW] MultipleRegressor.named_features: It can return the dimension reduction result with "field name" except the column "const" instead of "index". For example: ['R&D Spend', 'Marketing Spend'].
 * 2023/02/05-01
   * [NEW] MultipleRegressor: Now it can automatically detect if there are constants in the incoming X_train and X_test. If not, it will be added automatically.
 * 2021/06/06-01

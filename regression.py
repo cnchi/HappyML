@@ -40,10 +40,15 @@ class MultipleRegressor:
     def __init__(self) :
         self.__regressor = None
         self.__features = None
+        self.__named_features = None
 
     @property
     def regressor(self):
         return self.__regressor
+
+    @property
+    def named_features(self):
+        return self.__named_features
 
     def add_constant(self, exog):
         # This function only support DataFrame
@@ -131,6 +136,7 @@ class MultipleRegressor:
             print("*** FINAL FEATURES: {}".format(feature_names))
 
         self.__features = final_features
+        self.__named_features = [x_train.columns[pos] for pos in final_features if x_train.columns[pos] != "const"]
         return final_features
 
     def r_score(self):
