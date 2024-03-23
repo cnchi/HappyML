@@ -9,6 +9,8 @@ HappyML 是一個教學用的機器學習函式庫。該函式庫簡化了機器
 
 # Revision History
 
+* 2024/03/23-01
+  * [NEW] pytorch.py: The file contains a class called Sequential. The class inherits torch.nn.Module and provides functions that allow people who are only familiar with TensorFlow/Keras, but not PyTorch, to build PyTorch models using Keras-like functions in the class.
 * 2023/02/10-01
   * [BUGFIX] preprocessor.feature_scaling(): Fix an error message caused by the feature_scaling() function when the incoming array is not a DataFrame. 
   * [NEW] MultipleRegressor.named_features: It can return the dimension reduction result with "field name" except the column "const" instead of "index". For example: ['R&D Spend', 'Marketing Spend'].
