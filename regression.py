@@ -69,7 +69,7 @@ class MultipleRegressor:
         if self.__features is not None:
             x_train = x_train.iloc[:, self.__features]
 
-        self.__regressor = sm.OLS(exog=x_train, endog=y_train).fit()
+        self.__regressor = sm.OLS(exog=x_train.astype("float"), endog=y_train.astype("float")).fit()
         return self
 
     def predict(self, x_test):
