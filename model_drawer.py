@@ -49,6 +49,24 @@ def classify_result(x, y, classifier, fg_color=("orange", "blue"), bg_color=("re
     xlabel = x.columns[0]
     ylabel = x.columns[1]
 
+    # Convert the color strings into hex codes
+    # This is for compatibility with ListedColormap when matplotlib >= 3.8.0
+    color_hex_codes = {
+        'red': '#FF0000',
+        'green': '#008000',
+        'blue': '#0000FF',
+        'yellow': '#FFFF00',
+        'cyan': '#00FFFF',
+        'magenta': '#FF00FF',
+        'black': '#000000',
+        'white': '#FFFFFF',
+        'orange': '#FFA500',
+        'purple': '#800080'
+    }
+
+    fg_color = [color_hex_codes[color] for color in fg_color]
+    bg_color = [color_hex_codes[color] for color in bg_color]
+
     # Prepare each dot of background
     x = x.values
     y = y.values
