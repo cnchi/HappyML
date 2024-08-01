@@ -14,12 +14,20 @@ from tensorflow.keras import layers
 def create_seq_model(nodes=[], weight_init="glorot_normal",
                      hidden_activation="relu", opt_name="adam", metric_list=["acc"],
                      output_activation="softmax", loss_name="categorical_crossentropy"):
+	# Check the version of Keras
+	keras_version = tf.keras.__version__
+
 	# Create Sequential Model
 	model = Sequential()
 
 	if nodes != []:
 		# Create Input Layer
-		model.add(layers.InputLayer(input_shape=nodes[0], name="input"))
+		if keras_version.startswith("2."):
+			model.add(layers.InputLayer(input_shape=nodes[0], name="input"))
+		elif keras_version.startswith("3."):
+			model.add(layers.Input(shape=(nodes[0],), name="input"))
+		else:
+			raise ValueError(f"Unsupported Keras version: {keras_version}, please use 2.x or 3.x instead.")
 
 		# Create Hidden Layers
 		for i in range(1, len(nodes)-1):
