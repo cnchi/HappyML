@@ -199,6 +199,9 @@ def show_first_n_images(x_ary, y_real=[], y_pred=[], first_n=5, font_size=18, co
     # Get Current Figure (GCF) & Set Height 15 inches, Width 4 inches
     plt.gcf().set_size_inches(15, 4)
 
+    # Convert y_pred as NumPy NDArray
+    y_pred = np.array(y_pred)
+
     # Iterate the first N images
     for i in range(first_n):
         # each row has first_n sub-images
@@ -208,7 +211,7 @@ def show_first_n_images(x_ary, y_real=[], y_pred=[], first_n=5, font_size=18, co
         ax.imshow(x_ary[i], cmap=color_scheme)
 
         # set sub-image title
-        if y_pred == []:
+        if y_pred.size == 0:
             img_title = "real = {}".format(y_real[i])
         else:
             img_title = "real = {}\npred = {}".format(y_real[i], y_pred[i])
